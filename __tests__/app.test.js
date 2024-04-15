@@ -8,22 +8,25 @@ beforeEach(() => seed(data));
 afterAll(() => db.end());
 
 describe("/api/topics", () => {
-    test("GET 200: Should return an array", () => {
+    test("GET 200: Should return an object with an array on its 'topics' key", () => {
         return request(app)
         .get("/api/topics")
         .expect(200)
         .then(({body}) => {
-            expect(Array.isArray(body)).toBe(true)
+            const {topics} = body
+            expect(typeof body).toBe("object")
+            expect(Array.isArray(topics)).toBe(true)
         })
     })
     test("GET 200: Should return an array of topic objects", () => {
-        const topics = require(`${__dirname}/../db/data/test-data/topics.js`)
+        const topicsFile = require(`${__dirname}/../db/data/test-data/topics.js`)
         return request(app)
         .get("/api/topics")
         .expect(200)
         .then(({body}) => {
-            expect(body.length).toBe(topics.length)
-            expect(body).toEqual(topics)
+            const {topics} = body
+            expect(topics.length).toBe(topicsFile.length)
+            expect(topics).toEqual(topicsFile)
         })
     })
     test("GET 404: Should return a 'Path not found' is the path is incorrect", () => {
