@@ -1,8 +1,10 @@
 const db = require("../db/connection")
-const fs = require("fs")
 
 function fetchTopics() {
-    return require(`${__dirname}/../db/data/test-data/topics.js`)
+    return db.query("SELECT slug, description FROM topics;")
+    .then((topics) => {
+        return topics.rows
+    })
 }
 
 function fetchEndPoints() {
@@ -10,3 +12,5 @@ function fetchEndPoints() {
 }
 
 module.exports = {fetchTopics, fetchEndPoints}
+
+//(`${__dirname}/../db/data/test-data/topics.js`)
