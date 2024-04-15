@@ -5,4 +5,8 @@ function fetchTopics() {
     return require(`${__dirname}/../db/data/test-data/topics.js`)
 }
 
-module.exports = {fetchTopics}
+function fetchEndPoints() {
+    return require(`${__dirname}/../endpoints.json`)
+}
+
+module.exports = {fetchTopics, fetchEndPoints}

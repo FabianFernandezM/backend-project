@@ -12,5 +12,8 @@ Once this is done, please have a look at the setup.sql file to drop and create y
 
 ## Endpoints
 
+### /api
+- **GET**: retrieves a list of the current endpoints present on the database.
+
 ### /api/topics
 - **GET**: retrieves a list of the current topics present on the database.

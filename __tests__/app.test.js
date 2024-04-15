@@ -36,3 +36,24 @@ describe("/api/topics", () => {
         })
     })
 })
+
+describe("/api", () => {
+    test("GET 200: Should return an object", () => {
+        return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({body}) => {
+            expect(typeof body).toBe("object")
+        })
+    })
+    test("GET 200: Should return an object with current endpoints with all information matching the endpoints.json file", () => {
+        const endpoints = require(`${__dirname}/../endpoints.json`)
+        return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({body}) => {
+            expect(body.length).toBe(endpoints.length)
+            expect(body).toEqual(endpoints)
+        })
+    })
+})
