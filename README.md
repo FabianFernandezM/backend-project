@@ -26,3 +26,8 @@ This file contains information about all endpoints present on the database. It *
 - **GET**: retrieves a list of the current topics present on the database.
     - **Parameters**: N/A
     - **Output**: Returns an ***array*** containing all (***object***) topics from the database.
+
+### /api/articles/:article_id
+- **GET**: retrieves an article with the requested ID.
+    - **Parameters**: article_id (number)
+    - **Output**: Returns an article ***object*** from the database.
