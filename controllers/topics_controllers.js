@@ -1,4 +1,4 @@
-const {fetchTopics, fetchArticleById} = require("../models/topics_models")
+const {fetchTopics, fetchArticleById, fetchArticles} = require("../models/topics_models")
 
 async function getTopics(req, res, next) {
     try {
@@ -26,4 +26,14 @@ async function getArticleById(req, res, next) {
     }
 }
 
-module.exports = {getTopics, getEndpoints, getArticleById}
+async function getArticles(req, res, next) {
+    try {
+        const articles = await fetchArticles()
+        res.status(200).send({articles})
+    } 
+    catch (error) {
+        next(error)
+    }
+}
+
+module.exports = {getTopics, getEndpoints, getArticleById, getArticles}
