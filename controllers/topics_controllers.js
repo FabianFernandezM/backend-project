@@ -1,4 +1,4 @@
-const {fetchTopics, fetchEndPoints, fetchArticleById} = require("../models/topics_models")
+const {fetchTopics, fetchArticleById} = require("../models/topics_models")
 
 async function getTopics(req, res, next) {
     try {
@@ -10,14 +10,9 @@ async function getTopics(req, res, next) {
     }
 }
 
-async function getEndpoints(req, res, next) {
-    try {
-        const endpoints = await fetchEndPoints()
-        res.status(200).send({endpoints})
-    } 
-    catch (error) {
-        next(error)
-    }
+function getEndpoints(req, res, next) {
+    const endpoints = require(`${__dirname}/../endpoints.json`)
+    res.status(200).send({endpoints})
 }
 
 async function getArticleById(req, res, next) {

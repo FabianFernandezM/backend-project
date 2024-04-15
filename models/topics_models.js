@@ -7,10 +7,6 @@ function fetchTopics() {
     })
 }
 
-function fetchEndPoints() {
-    return require(`${__dirname}/../endpoints.json`)
-}
-
 function fetchArticleById(article_id) {
     return db.query(`SELECT author, title, article_id, body, topic, created_at, votes, article_img_url
     FROM articles
@@ -21,4 +17,4 @@ function fetchArticleById(article_id) {
     })
 }
 
-module.exports = {fetchTopics, fetchEndPoints, fetchArticleById}
+module.exports = {fetchTopics, fetchArticleById}
