@@ -13,7 +13,7 @@ async function getTopics(req, res, next) {
 async function getEndpoints(req, res, next) {
     try {
         const endpoints = await fetchEndPoints()
-        res.status(200).send(endpoints)
+        res.status(200).send({endpoints})
     } 
     catch (error) {
         next(error)

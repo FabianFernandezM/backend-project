@@ -43,17 +43,19 @@ describe("/api", () => {
         .get("/api")
         .expect(200)
         .then(({body}) => {
-            expect(typeof body).toBe("object")
+            const {endpoints} = body
+            expect(typeof endpoints).toBe("object")
         })
     })
     test("GET 200: Should return an object with current endpoints with all information matching the endpoints.json file", () => {
-        const endpoints = require(`${__dirname}/../endpoints.json`)
+        const endpointsFile = require(`${__dirname}/../endpoints.json`)
         return request(app)
         .get("/api")
         .expect(200)
         .then(({body}) => {
-            expect(body.length).toBe(endpoints.length)
-            expect(body).toEqual(endpoints)
+            const {endpoints} = body
+            expect(endpoints.length).toBe(endpointsFile.length)
+            expect(endpoints).toEqual(endpointsFile)
         })
     })
 })
