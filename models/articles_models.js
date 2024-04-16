@@ -22,6 +22,13 @@ async function fetchArticleById(article_id) {
     return article.rows[0]
 }
 
+async function updateArticleById(article_id, inc_votes) {
+    const article = await db.query(`UPDATE articles
+    SET votes = votes + $2
+    WHERE article_id = $1 RETURNING *;`, [article_id, inc_votes])
+    return article.rows[0]
+}
+
 async function fetchArticleCommentsById(article_id) {
     const comments = await db.query(`SELECT comment_id, votes, created_at, author, body, article_id
     FROM comments
@@ -35,4 +42,4 @@ async function insertArticleCommentById(article_id, newComment) {
     return comment.rows[0]
 }
 
-module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById}
+module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById, updateArticleById}
