@@ -30,7 +30,7 @@ This file contains information about all endpoints present on the database. It *
 ### /api/articles
 - **GET**: retrieves the list of articles present in the database.
     - **Parameters**: N/A
-    - **Output**: Returns an ***object*** with an "articles" key containing an (***array***)  with all (***object***) articles from the database.
+    - **Output**: Returns an ***object*** with an "articles" key containing an ***array***  with all (***object***) articles from the database.
 
 ### /api/articles/:article_id
 - **GET**: retrieves an article with the requested ID.
@@ -44,14 +44,19 @@ This file contains information about all endpoints present on the database. It *
 ### /api/articles/:article_id/comments
 - **GET**: retrieves a list of comments from the requested article ID.
     - **Parameters**: article_id (number)
-    - **Output**: Returns an ***object*** with a "comments" key containing an (***array***) of comments from the database.
+    - **Output**: Returns an ***object*** with a "comments" key containing an ***array*** of comments from the database.
 - **POST**: posts a comment to the requested article ID and retrieves the posted comment.
     - **Parameters**: article_id (number)
     - **Body**: {username: "string", body: "string"}
-    - **Output**: Returns an ***object*** with a "comment" key containing an (***array***) with the posted comment.
+    - **Output**: Returns an ***object*** with a "comment" key containing an ***array*** with the posted comment.
 
 ### /api/comments/:comment_id
 - **DELETE**: deletes the comment with the ID provided. Returns nothing.
     - **Parameters**: comment_id (number)
     - **Output**: N/A
+
+### /api/users
+- **GET**: retrieves the list of users present in the database.
+    - **Parameters**: N/A
+    - **Output**: Returns an ***object*** with an "users" key containing an ***array***  with all (***object***) users from the database.
 
