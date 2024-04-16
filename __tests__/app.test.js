@@ -107,6 +107,61 @@ describe("/api/articles/:article_id", () => {
     });
 })
 
+describe("/api/articles/:article_id/comments", () => {
+    test("GET 200: Should return an array of comment objects with the correct keys", () => {
+        return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({body}) => {
+            const {comments} = body
+            expect(comments.length).toBe(11)
+            comments.forEach(comment => {
+                expect(typeof comment.comment_id).toBe("number")
+                expect(typeof comment.votes).toBe("number")
+                expect(typeof comment.created_at).toBe("string")
+                expect(typeof comment.author).toBe("string")
+                expect(typeof comment.body).toBe("string")
+                expect(typeof comment.article_id).toBe("number")
+            });
+        })
+    })
+    test("GET 200: Should return an array of comment objects ordered by most recent first", () => {
+        return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then(({body}) => {
+            const {comments} = body
+            expect(comments.length).toBe(11)
+            expect(comments).toBeSortedBy("created_at", {descending: true})
+        })
+    })
+    test("GET 200: If the article exists but has no comments, it should return an empty array", () => {
+        return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then(({body}) => {
+            const {comments} = body
+            expect(comments.length).toBe(0)
+        })
+    })
+    test('GET 404: sends an appropriate status and error message when given a valid but non-existent id', () => {
+        return request(app)
+          .get('/api/articles/999/comments')
+          .expect(404)
+          .then(({body}) => {
+            expect(body.message).toBe('This article does not exist');
+        });
+    });
+    test('GET 400: sends an appropriate status and error message when given an invalid id', () => {
+        return request(app)
+          .get('/api/articles/not-an-id/comments')
+          .expect(400)
+          .then(({body}) => {
+            expect(body.message).toBe('Bad request');
+        });
+    });
+})
+
 describe("/api/articles", () => {
     test("GET 200: Should return an object with an array on its 'articles' key", () => {
         return request(app)

@@ -37,4 +37,9 @@ This file contains information about all endpoints present on the database. It *
     - **Parameters**: article_id (number)
     - **Output**: Returns an ***object*** with an "article" key containing an (***object***) article from the database.
 
+### /api/articles/:article_id/comments
+- **GET**: retrieves a list of comments from the requested article ID.
+    - **Parameters**: article_id (number)
+    - **Output**: Returns an ***object*** with an "comments" key containing an (***array***) of comments from the database.
+
 
