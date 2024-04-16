@@ -36,6 +36,10 @@ This file contains information about all endpoints present on the database. It *
 - **GET**: retrieves an article with the requested ID.
     - **Parameters**: article_id (number)
     - **Output**: Returns an ***object*** with an "article" key containing an (***object***) article from the database.
+- **POST**: Updates and article's votes key and responds with the updated article.
+    - **Parameters**: article_id (number)
+    - **Body**: {inc_votes: "number"}
+    - **Output**: Returns an ***object*** with an "article" key containing an updated (***object***) article from the database.
 
 ### /api/articles/:article_id/comments
 - **GET**: retrieves a list of comments from the requested article ID.
