@@ -40,6 +40,9 @@ This file contains information about all endpoints present on the database. It *
 ### /api/articles/:article_id/comments
 - **GET**: retrieves a list of comments from the requested article ID.
     - **Parameters**: article_id (number)
-    - **Output**: Returns an ***object*** with an "comments" key containing an (***array***) of comments from the database.
-
+    - **Output**: Returns an ***object*** with a "comments" key containing an (***array***) of comments from the database.
+- **POST**: posts a comment to the requested article ID and retrieves the posted comment.
+    - **Parameters**: article_id (number)
+    - **Body**: {username: "string", body: "string"}
+    - **Output**: Returns an ***object*** with a "comment" key containing an (***array***) with the posted comment.
 

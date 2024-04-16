@@ -1,4 +1,4 @@
-const {fetchArticleById, fetchArticles, fetchArticleCommentsById} = require("../models/articles_models")
+const {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById} = require("../models/articles_models")
 
 async function getArticleById(req, res, next) {
     const { article_id } = req.params
@@ -33,4 +33,17 @@ async function getArticles(req, res, next) {
     }
 }
 
-module.exports = {getArticleById, getArticles, getArticleCommentsById}
+async function postArticleCommentById(req, res, next) {
+    const { article_id } = req.params
+    const newComment = req.body
+    try {
+        await fetchArticleById(article_id)
+        const comment = await insertArticleCommentById(article_id, newComment)
+        res.status(201).send({comment})
+    } 
+    catch (error) {
+        next(error)
+    }
+}
+
+module.exports = {getArticleById, getArticles, getArticleCommentsById, postArticleCommentById}

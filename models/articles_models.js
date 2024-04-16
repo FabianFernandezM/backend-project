@@ -36,4 +36,11 @@ function fetchArticleCommentsById(article_id) {
     })
 }
 
-module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById}
+function insertArticleCommentById(article_id, newComment) {
+    return db.query(`INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;`, [newComment.username, newComment.body, article_id])
+    .then((comment) => {
+        return comment.rows[0]
+    })
+}
+
+module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById}
