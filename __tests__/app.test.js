@@ -160,6 +160,62 @@ describe("/api/articles/:article_id/comments", () => {
             expect(body.message).toBe('Bad request');
         });
     });
+    test("POST 201: Should return the posted comment", () => {
+        const newComment = { username: "rogersop", body: "This is interesting" }
+        return request(app)
+            .post("/api/articles/1/comments")
+            .send(newComment)
+            .expect(201)
+            .then(({body}) => {
+                const {comment} = body
+                expect(comment.comment_id).toBe(19)
+                expect(comment.votes).toBe(0)
+                expect(typeof comment.created_at).toBe("string")
+                expect(comment.author).toBe("rogersop")
+                expect(comment.body).toBe("This is interesting")
+                expect(comment.article_id).toBe(1)
+        })
+    })
+    test('POST 404: sends an appropriate status and error message when given a valid but non-existent id', () => {
+        const newComment = { username: "rogersop", body: "This is interesting" }
+        return request(app)
+            .post("/api/articles/999/comments")
+            .send(newComment)
+            .expect(404)
+            .then(({body}) => {
+                expect(body.message).toBe('This article does not exist');
+        });
+    });
+    test('POST 400: sends an appropriate status and error message when given an invalid id', () => {
+        const newComment = { username: "rogersop", body: "This is interesting" }
+        return request(app)
+            .post("/api/articles/not-an-id/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.message).toBe('Bad request');
+        });
+    });
+    test('POST 400: sends an appropriate status and error message when given an incomplete input object', () => {
+        const newComment = { username: "rogersop" }
+        return request(app)
+            .post("/api/articles/not-an-id/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.message).toBe('Bad request');
+        });
+    });
+    test('POST 400: sends an appropriate status and error message when given an input object with wrong datatype on keys', () => {
+        const newComment = { username: 52666, body: false }
+        return request(app)
+            .post("/api/articles/not-an-id/comments")
+            .send(newComment)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.message).toBe('Bad request');
+        });
+    });
 })
 
 describe("/api/articles", () => {
