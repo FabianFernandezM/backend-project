@@ -24,8 +24,10 @@ async function getArticleCommentsById(req, res, next) {
 }
 
 async function getArticles(req, res, next) {
+    const query = req.query
+    const queryNames = Object.keys(req.query)
     try {
-        const articles = await fetchArticles()
+        const articles = await fetchArticles(query, queryNames)
         res.status(200).send({articles})
     } 
     catch (error) {

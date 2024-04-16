@@ -103,6 +103,37 @@ describe("/api/articles", () => {
             expect(articles).toBeSortedBy("created_at", {descending: true})
         })
     })
+    test("GET 200: Should return an array of article objects with the correct topic as per specified query value", () => {
+        return request(app)
+        .get("/api/articles?topic=mitch")
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles.length).toBe(12)
+            expect(articles).toBeSortedBy("created_at", {descending: true})
+            articles.forEach(article => {
+                article.topic = "mitch"
+            });
+        })
+    })
+    test("GET 404: Should return 'Not found' if the query name is valid but the value is not found within the database", () => {
+        return request(app)
+        .get("/api/articles?topic=banana")
+        .expect(404)
+        .then(({body}) => {
+            const {message} = body
+            expect(message).toBe("Not found")
+        })
+    })
+    test("GET 400: Should return 'Query not allowed' if the query name is not valid", () => {
+        return request(app)
+        .get("/api/articles?banana=topic")
+        .expect(400)
+        .then(({body}) => {
+            const {message} = body
+            expect(message).toBe("Query not allowed")
+        })
+    })
 })
 
 describe("/api/articles/:article_id", () => {
