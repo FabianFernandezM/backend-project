@@ -118,14 +118,13 @@ describe("/api/articles", () => {
             expect(Array.isArray(articles)).toBe(true)
         })
     })
-    test("GET 200: Should return an array of article objects with the correct keys, ordered in DESC order by 'created_at' value", () => {
+    test("GET 200: Should return an array of article objects with the correct keys", () => {
         return request(app)
         .get("/api/articles")
         .expect(200)
         .then(({body}) => {
             const {articles} = body
             expect(articles.length).toBe(13)
-            expect(articles).toBeSortedBy("created_at", {descending: true})
             articles.forEach(article => {
                 expect(typeof article.author).toBe("string")
                 expect(typeof article.title).toBe("string")
@@ -136,6 +135,16 @@ describe("/api/articles", () => {
                 expect(typeof article.article_img_url).toBe("string")
                 expect(typeof article.comment_count).toBe("string")
             });
+        })
+    })
+    test("GET 200: Should return an array of article objects ordered in DESC order by 'created_at' value", () => {
+        return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles.length).toBe(13)
+            expect(articles).toBeSortedBy("created_at", {descending: true})
         })
     })
 })
