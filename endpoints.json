@@ -97,5 +97,18 @@
   "DELETE /api/comments/:comment_id": {
     "description": "deletes a comment with the provided ID. Returns nothing",
     "queries": []
+  },
+  "GET /api/users": {
+    "description": "serves an array of all users",
+    "queries": [],
+    "exampleResponse": {
+      "comment": [
+        {
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https//www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        }
+      ]
+    }
   }
 }

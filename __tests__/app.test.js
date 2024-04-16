@@ -351,3 +351,20 @@ describe("/api/comments/:comment_id", () => {
         });
     })
 })
+
+describe("/api/users", () => {
+    test("GET 200: Should return an object with an 'users' key containing an array of user objects with the correct keys", () => {
+        return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then(({body}) => {
+            const {users} = body
+            expect(users.length).toBe(4)
+            users.forEach(user => {
+                expect(typeof user.username).toBe("string")
+                expect(typeof user.name).toBe("string")
+                expect(typeof user.avatar_url).toBe("string")
+            });
+        })
+    })
+})
