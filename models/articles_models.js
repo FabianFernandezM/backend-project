@@ -1,16 +1,32 @@
 const db = require("../db/connection")
 
-async function fetchArticles() {
-    const sqlStr = `SELECT articles.author, articles.title, articles.article_id,
+async function fetchArticles(query, queryNames) {
+    const validQueryNames = ["topic"]
+
+    for (let i = 0; i < queryNames.length; i++) {
+        if (!validQueryNames.includes(queryNames[i]))
+        return Promise.reject({ status: 400, message: `Query not allowed` })
+    }
+
+
+    let sqlStr = `SELECT articles.author, articles.title, articles.article_id,
     articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
     COUNT(comments.comment_id) AS comment_count
     FROM articles
     LEFT JOIN comments
-    ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id
+    ON articles.article_id = comments.article_id `
+    const queryValues = []
+
+    if (query.topic){
+        sqlStr += `WHERE topic=$1 `
+        queryValues.push(query.topic)
+    }
+
+    sqlStr += `GROUP BY articles.article_id
     ORDER BY articles.created_at DESC;`
 
-    const articles = await db.query(sqlStr)
+    const articles = await db.query(sqlStr, queryValues)
+    if (articles.rows.length === 0) return Promise.reject({ status: 404, message: "Not found" })
     return articles.rows
 }
 
