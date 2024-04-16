@@ -209,7 +209,7 @@ describe("/api/articles/:article_id/comments", () => {
     test('POST 400: sends an appropriate status and error message when given an input object with wrong datatype on keys', () => {
         const newComment = { username: 52666, body: false }
         return request(app)
-            .post("/api/articles/not-an-id/comments")
+            .post("/api/articles/1/comments")
             .send(newComment)
             .expect(400)
             .then(({body}) => {

@@ -22,6 +22,9 @@ app.use((err, req, res, next)=>{
       case "23502": 
         res.status(400).send({message: 'Bad request'})
         break;
+      case "23503": 
+        res.status(400).send({message: 'Bad request'})
+        break;
       case "22P02": 
         res.status(400).send({message: 'Bad request'})
         break;
