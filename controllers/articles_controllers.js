@@ -52,7 +52,6 @@ async function patchArticleById(req, res, next) {
     try {
         await fetchArticleById(article_id)
         const article = await updateArticleById(article_id, inc_votes)
-        console.log({article})
         res.status(200).send({article})
     } 
     catch (error) {

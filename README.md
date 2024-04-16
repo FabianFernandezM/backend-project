@@ -50,3 +50,8 @@ This file contains information about all endpoints present on the database. It *
     - **Body**: {username: "string", body: "string"}
     - **Output**: Returns an ***object*** with a "comment" key containing an (***array***) with the posted comment.
 
+### /api/comments/:comment_id
+- **DELETE**: deletes the comment with the ID provided. Returns nothing.
+    - **Parameters**: comment_id (number)
+    - **Output**: N/A
+
