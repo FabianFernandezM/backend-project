@@ -1,14 +1,33 @@
 # Northcoders News API
 
+## What is NC News API?
+
+NC News API allows the creation of SQL-based databases and permits the user to interact with databases through different endpoints. 
+
+To see a live example of this API, please follow this link: [NC News](https://nc-news-78g8.onrender.com/). You can use the endpoints listed in this file to see what the API returns when calling different endpoints.
+
 ## Setup
 
-In order to run this project, you will need to set up your test and development databases:
-1. On the main project folder, create two .env files: ".env.development" and ".env.test"
-2. On each one of these files, add the following line: "PGDATABASE=yourDatabaseName"
+First off, clone the repository to your local machine. You can find information on how to do this here: [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
+
+*Please note that if you plan to develop this API further and use it in production, you might need your own Github repository*
+
+Once you have cloned the repository, open it with your preferred software (example: [VSCode](https://code.visualstudio.com/download)) and run the following commands in the console:
+- **npm install** *// Installs all npm dependencies*
+- **npm setup-dbs** *// Drops and set up databases as specified in the setup.psql file*
+- **npm seed** *// Seeds database with the data present in db/data folders*
+
+If you would like to run any tests during your development, you can use **npm test**. This will run all JEST tests present in the *__test__* folder
+
+Once you have completed the above, you will need to set up your test and development databases:
+1. On the root project folder, create two .env files: "**.env.development**" and "**.env.test**"
+2. On each one of these files, add the following line: "**PGDATABASE=yourDatabaseName**"
 
 Please ensure to name your databases appropriately depending on their intended use. 
 
 Once this is done, please have a look at the setup.sql file to drop and create your databases as needed. 
+
+Please note you will need both **Node.js v21.6.1** and **PostgreSQL 14.11** (or newer) to run this project.
 
 ## Files
 
