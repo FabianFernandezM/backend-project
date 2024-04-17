@@ -1,11 +1,17 @@
 const db = require("../db/connection")
 
 async function fetchArticles(query, queryNames) {
-    const validQueryNames = ["topic"]
+    const validQueryNames = ["topic", "sort_by", "order"]
+    const validTopics = db.query("")
 
     for (let i = 0; i < queryNames.length; i++) {
         if (!validQueryNames.includes(queryNames[i]))
         return Promise.reject({ status: 400, message: `Query not allowed` })
+    }
+
+    for (let i = 0; i < queryNames.length; i++) {
+        const queryExists = await checkQueryExists(query, "articles", queryNames[i])
+        if (queryExists === false) return Promise.reject({ status: 404, message: "Not found" })
     }
 
 
@@ -22,16 +28,14 @@ async function fetchArticles(query, queryNames) {
         queryValues.push(query.topic)
     }
 
-    sqlStr += `GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC;`
+    sqlStr += `GROUP BY articles.article_id `
+
+    if (query.sort_by){
+        sqlStr += `ORDER BY articles.$2 $3;`
+        queryValues.push("created_at", "DESC")
+    } else {sqlStr += `ORDER BY articles.created_at DESC;`}
 
     const articles = await db.query(sqlStr, queryValues)
-
-    for (let i = 0; i < queryNames.length; i++) {
-        const queryExists = await checkQueryExists(query, "articles", queryNames[i])
-        if (queryExists === false) return Promise.reject({ status: 404, message: "Not found" })
-    }
-
     return articles.rows
 }
 
@@ -70,7 +74,7 @@ async function insertArticleCommentById(article_id, newComment) {
 
 async function checkQueryExists(query, table, queryName){
     const validQueries = await db.query(`SELECT ${queryName} FROM ${table} GROUP BY ${queryName};`)
-    const validQueryQueries = validQueries.rows.map(obj => obj.topic)
+    const validQueryQueries = validQueries.rows.map(obj => obj[queryName])
 
     if (!validQueryQueries.includes(query[queryName])) return false
 }
