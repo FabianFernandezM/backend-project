@@ -18,12 +18,6 @@ async function fetchArticles(query, queryNames) {
     const queryValues = []
 
     if (query.topic){
-        const validTopics = await db.query(`SELECT topic FROM articles GROUP BY topic;`)
-        const validTopicQueries = validTopics.rows.map(obj => obj.topic)
-
-        if (!validTopicQueries.includes(query.topic))
-        return Promise.reject({ status: 404, message: "Not found" })
-
         sqlStr += `WHERE topic=$1 `
         queryValues.push(query.topic)
     }
@@ -32,6 +26,12 @@ async function fetchArticles(query, queryNames) {
     ORDER BY articles.created_at DESC;`
 
     const articles = await db.query(sqlStr, queryValues)
+
+    for (let i = 0; i < queryNames.length; i++) {
+        const queryExists = await checkQueryExists(query, "articles", queryNames[i])
+        if (queryExists === false) return Promise.reject({ status: 404, message: "Not found" })
+    }
+
     return articles.rows
 }
 
@@ -61,6 +61,13 @@ async function fetchArticleCommentsById(article_id) {
 async function insertArticleCommentById(article_id, newComment) {
     const comment = await db.query(`INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3) RETURNING *;`, [newComment.username, newComment.body, article_id])
     return comment.rows[0]
+}
+
+async function checkQueryExists(query, table, queryName){
+    const validQueries = await db.query(`SELECT ${queryName} FROM ${table} GROUP BY ${queryName};`)
+    const validQueryQueries = validQueries.rows.map(obj => obj.topic)
+
+    if (!validQueryQueries.includes(query[queryName])) return false
 }
 
 module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById, updateArticleById}
