@@ -18,6 +18,12 @@ async function fetchArticles(query, queryNames) {
     const queryValues = []
 
     if (query.topic){
+        const validTopics = await db.query(`SELECT topic FROM articles GROUP BY topic;`)
+        const validTopicQueries = validTopics.rows.map(obj => obj.topic)
+
+        if (!validTopicQueries.includes(query.topic))
+        return Promise.reject({ status: 404, message: "Not found" })
+
         sqlStr += `WHERE topic=$1 `
         queryValues.push(query.topic)
     }
@@ -26,7 +32,6 @@ async function fetchArticles(query, queryNames) {
     ORDER BY articles.created_at DESC;`
 
     const articles = await db.query(sqlStr, queryValues)
-    if (articles.rows.length === 0) return Promise.reject({ status: 404, message: "Not found" })
     return articles.rows
 }
 
