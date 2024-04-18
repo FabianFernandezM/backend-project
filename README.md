@@ -81,3 +81,8 @@ This file contains information about all endpoints present on the database. It *
     - **Parameters**: N/A
     - **Output**: Returns an ***object*** with an "users" key containing an ***array***  with all (***object***) users from the database.
 
+### /api/users/:username
+- **GET**: retrieves a user from the database.
+    - **Parameters**: username
+    - **Output**: Returns an ***object*** with an "user" key containing an (***object***) user from the database.
+
