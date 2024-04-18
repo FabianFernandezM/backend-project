@@ -11,4 +11,11 @@ async function removeCommentById(comment_id) {
     return output
 }
 
-module.exports = { removeCommentById , fetchCommentById}
+async function updateCommentById(comment_id, inc_votes) {
+    const article = await db.query(`UPDATE comments
+    SET votes = votes + $2
+    WHERE comment_id = $1 RETURNING *;`, [comment_id, inc_votes])
+    return article.rows[0]
+}
+
+module.exports = { removeCommentById , fetchCommentById, updateCommentById}

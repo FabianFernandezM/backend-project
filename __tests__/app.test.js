@@ -426,6 +426,63 @@ describe("/api/comments/:comment_id", () => {
             });
         });
     })
+    describe ("PATCH", () => {
+        test("PATCH 200: Should return the updated comment", () => {
+            const votes = { inc_votes : 1 }
+            return request(app)
+            .patch("/api/comments/1")
+            .send(votes)
+            .expect(200)
+            .then(({body}) => {
+                const {comment} = body
+                expect(comment.comment_id).toBe(1)
+                expect(comment.body).toBe("Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!")
+                expect(comment.votes).toBe(17)
+                expect(comment.author).toBe("butter_bridge")
+                expect(comment.created_at).toBe("2020-04-06T12:17:00.000Z")
+            })
+        })
+        test('PATCH 404: sends an appropriate status and error message when given a valid but non-existent comment id', () => {
+            const votes = { inc_votes : 1 }
+            return request(app)
+              .patch('/api/comments/999')
+              .send(votes)
+              .expect(404)
+              .then(({body}) => {
+                expect(body.message).toBe('This comment does not exist');
+            });
+        });
+        test('PATCH 400: sends an appropriate status and error message when given an invalid article id', () => {
+            const votes = { inc_votes : 1 }
+            return request(app)
+              .patch('/api/comments/not-an-id')
+              .send(votes)
+              .expect(400)
+              .then(({body}) => {
+                expect(body.message).toBe('Bad request');
+            });
+        });
+        test("PATCH 400: sends an appropriate status and error message when given an invalid input object", () => {
+            const votes = { wrong_key : "hello" }
+            return request(app)
+            .patch("/api/comments/1")
+            .send(votes)
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body
+                expect(message).toBe("Bad request")})
+        })
+        test("PATCH 400: sends an appropriate status and error message when given valid object with wrong datatype keys", () => {
+            const votes = { inc_votes : "not-a-number" }
+            return request(app)
+            .patch("/api/comments/1")
+            .send(votes)
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body
+                expect(message).toBe("Bad request")})
+        })
+    })
 })
 
 describe("/api/users", () => {
@@ -445,7 +502,7 @@ describe("/api/users", () => {
     })
 })
 
-describe.only("/api/users/:username", () => {
+describe("/api/users/:username", () => {
     test("GET 200: Should return an object with an 'user' key containing the correct user", () => {
         return request(app)
         .get("/api/users/butter_bridge")

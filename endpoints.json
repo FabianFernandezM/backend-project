@@ -99,6 +99,23 @@
     "description": "deletes a comment with the provided ID. Returns nothing",
     "queries": []
   },
+  "PATCH /api/comments/:comment_id": {
+    "description": "Updates votes value on a comment",
+    "queries": [],
+    "body": { "inc_votes" : "1" },
+    "exampleResponse": {
+      "comment": [
+        {
+          "comment_id": "19",
+          "votes": "1",
+          "created_at": "2020-04-11T21:02:00.000Z",
+          "author": "icellusedkars",
+          "body":"This is interesting",
+          "article_id": "1"
+        }
+      ]
+    }
+  },
   "GET /api/users": {
     "description": "serves an array of all users",
     "queries": [],

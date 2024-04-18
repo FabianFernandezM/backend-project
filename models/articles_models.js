@@ -79,13 +79,6 @@ async function insertArticleCommentById(article_id, newComment) {
     return comment.rows[0]
 }
 
-async function checkQueryExists(query, table, queryName){
-    const validQueries = await db.query(`SELECT ${queryName} FROM ${table} GROUP BY ${queryName};`)
-    const validQueryQueries = validQueries.rows.map(obj => obj[queryName])
-
-    if (!validQueryQueries.includes(query[queryName])) return false
-}
-
 async function checkTopicExists(topic){
     const topics = await db.query(`SELECT topic FROM articles GROUP BY topic;`)
     const topicValues = topics.rows.map(obj => obj["topic"])
