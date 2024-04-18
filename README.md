@@ -44,6 +44,7 @@ This file contains information about all endpoints present on the database. It *
 ### /api/topics
 - **GET**: retrieves a list of the current topics present on the database.
     - **Parameters**: N/A
+    - **Queries**: topic, sort_by, order
     - **Output**: Returns an ***object*** with a "topic" key containing an ***array*** containing all (***object***) topics from the database.
 
 ### /api/articles
