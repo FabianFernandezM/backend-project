@@ -75,6 +75,10 @@ This file contains information about all endpoints present on the database. It *
 - **DELETE**: deletes the comment with the ID provided. Returns nothing.
     - **Parameters**: comment_id (number)
     - **Output**: N/A
+- **PATCH**: increase or decrease the votes key on the comment with the ID provided. Returns the updated comment.
+    - **Parameters**: comment_id (number)
+    - **Body**: { inc_votes : 1 }
+    - **Output**: Returns an ***object*** with a "comment" key containing an updated (***object***) comment from the database.
 
 ### /api/users
 - **GET**: retrieves the list of users present in the database.
