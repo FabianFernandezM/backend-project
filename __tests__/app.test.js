@@ -64,112 +64,156 @@ describe("/api/topics", () => {
 })
 
 describe("/api/articles", () => {
-    test("GET 200: Should return an object with an array on its 'articles' key", () => {
-        return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({body}) => {
-            const {articles} = body
-            expect(typeof body).toBe("object")
-            expect(Array.isArray(articles)).toBe(true)
+    describe("GET", () => {
+        test("GET 200: Should return an object with an array on its 'articles' key", () => {
+            return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body
+                expect(typeof body).toBe("object")
+                expect(Array.isArray(articles)).toBe(true)
+            })
+        })
+        test("GET 200: Should return an array of article objects with the correct keys", () => {
+            return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body
+                expect(articles.length).toBe(13)
+                articles.forEach(article => {
+                    expect(typeof article.author).toBe("string")
+                    expect(typeof article.title).toBe("string")
+                    expect(typeof article.article_id).toBe("number")
+                    expect(typeof article.topic).toBe("string")
+                    expect(typeof article.created_at).toBe("string")
+                    expect(typeof article.votes).toBe("number")
+                    expect(typeof article.article_img_url).toBe("string")
+                    expect(typeof article.comment_count).toBe("number")
+                });
+            })
+        })
+        test("GET 200: Should return an array of article objects ordered in DESC order by 'created_at' value", () => {
+            return request(app)
+            .get("/api/articles")
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body
+                expect(articles.length).toBe(13)
+                expect(articles).toBeSortedBy("created_at", {descending: true})
+            })
+        })
+        test("GET 200: Should return an array of article objects with the correct topic as per specified query value", () => {
+            return request(app)
+            .get("/api/articles?topic=mitch")
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body
+                expect(articles.length).toBe(12)
+                expect(articles).toBeSortedBy("created_at", {descending: true})
+                articles.forEach(article => {
+                    article.topic = "mitch"
+                });
+            })
+        })
+        test("GET 404: Should return 'Not found' if the query name is valid but the value is not found within the database", () => {
+            return request(app)
+            .get("/api/articles?topic=banana")
+            .expect(404)
+            .then(({body}) => {
+                const {message} = body
+                expect(message).toBe("Not found")
+            })
+        })
+        test("GET 400: Should return 'Query not allowed' if the query name is not valid", () => {
+            return request(app)
+            .get("/api/articles?banana=topic")
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body
+                expect(message).toBe("Query not allowed")
+            })
+        })
+        test("GET 200: Should return an array of article objects with the sorting as per specified query value", () => {
+            return request(app)
+            .get("/api/articles?sort_by=article_id")
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body
+                expect(articles).toBeSortedBy("article_id", {descending: true})
+            })
+        })
+        test("GET 400: Should return an error if the sort column does not exist", () => {
+            return request(app)
+            .get("/api/articles?sort_by=banana")
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body
+                expect(message).toBe("Column does not exist")
+            })
+        })
+        test("GET 200: Should return an array of article objects with the order as per specified query value", () => {
+            return request(app)
+            .get("/api/articles?order=asc")
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body
+                expect(articles).toBeSortedBy("created_at", {descending: false})
+            })
+        })
+        test("GET 400: Should return an error if order value is invalid", () => {
+            return request(app)
+            .get("/api/articles?order=banana")
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body
+                expect(message).toBe("Order not valid")
+            })
         })
     })
-    test("GET 200: Should return an array of article objects with the correct keys", () => {
-        return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({body}) => {
-            const {articles} = body
-            expect(articles.length).toBe(13)
-            articles.forEach(article => {
-                expect(typeof article.author).toBe("string")
-                expect(typeof article.title).toBe("string")
-                expect(typeof article.article_id).toBe("number")
-                expect(typeof article.topic).toBe("string")
-                expect(typeof article.created_at).toBe("string")
-                expect(typeof article.votes).toBe("number")
-                expect(typeof article.article_img_url).toBe("string")
-                expect(typeof article.comment_count).toBe("number")
+    describe ("POST", () => {
+        test("POST 201: Should return the posted comment", () => {
+            const newArticle = { author: "rogersop", title: "Nice article", body: "This is a nice article about cats", topic: "cats" }
+            return request(app)
+                .post("/api/articles")
+                .send(newArticle)
+                .expect(201)
+                .then(({body}) => {
+                    const {article} = body
+                    expect(article.article_id).toBe(14)
+                    expect(article.title).toBe("Nice article")
+                    expect(article.topic).toBe("cats")
+                    expect(article.author).toBe("rogersop")
+                    expect(article.body).toBe("This is a nice article about cats")
+                    expect(typeof article.created_at).toBe("string")
+                    expect(article.votes).toBe(0)
+                    expect(article.comment_count).toBe(0)
+                    expect(article.article_img_url).toBe("https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700")
+            })
+        })
+        test('POST 400: sends an appropriate status and error message when given an incomplete input object', () => {
+            const newArticle = { username: "rogersop" }
+            return request(app)
+                .post("/api/articles")
+                .send(newArticle)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.message).toBe('Bad request');
             });
-        })
-    })
-    test("GET 200: Should return an array of article objects ordered in DESC order by 'created_at' value", () => {
-        return request(app)
-        .get("/api/articles")
-        .expect(200)
-        .then(({body}) => {
-            const {articles} = body
-            expect(articles.length).toBe(13)
-            expect(articles).toBeSortedBy("created_at", {descending: true})
-        })
-    })
-    test("GET 200: Should return an array of article objects with the correct topic as per specified query value", () => {
-        return request(app)
-        .get("/api/articles?topic=mitch")
-        .expect(200)
-        .then(({body}) => {
-            const {articles} = body
-            expect(articles.length).toBe(12)
-            expect(articles).toBeSortedBy("created_at", {descending: true})
-            articles.forEach(article => {
-                article.topic = "mitch"
+        });
+        test('POST 400: sends an appropriate status and error message when given an input object with wrong datatype on keys', () => {
+            const newArticle = { username: 52666, body: false }
+            return request(app)
+                .post("/api/articles")
+                .send(newArticle)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.message).toBe('Bad request');
             });
-        })
+        });
     })
-    test("GET 404: Should return 'Not found' if the query name is valid but the value is not found within the database", () => {
-        return request(app)
-        .get("/api/articles?topic=banana")
-        .expect(404)
-        .then(({body}) => {
-            const {message} = body
-            expect(message).toBe("Not found")
-        })
-    })
-    test("GET 400: Should return 'Query not allowed' if the query name is not valid", () => {
-        return request(app)
-        .get("/api/articles?banana=topic")
-        .expect(400)
-        .then(({body}) => {
-            const {message} = body
-            expect(message).toBe("Query not allowed")
-        })
-    })
-    test("GET 200: Should return an array of article objects with the sorting as per specified query value", () => {
-        return request(app)
-        .get("/api/articles?sort_by=article_id")
-        .expect(200)
-        .then(({body}) => {
-            const {articles} = body
-            expect(articles).toBeSortedBy("article_id", {descending: true})
-        })
-    })
-    test("GET 400: Should return an error if the sort column does not exist", () => {
-        return request(app)
-        .get("/api/articles?sort_by=banana")
-        .expect(400)
-        .then(({body}) => {
-            const {message} = body
-            expect(message).toBe("Column does not exist")
-        })
-    })
-    test("GET 200: Should return an array of article objects with the order as per specified query value", () => {
-        return request(app)
-        .get("/api/articles?order=asc")
-        .expect(200)
-        .then(({body}) => {
-            const {articles} = body
-            expect(articles).toBeSortedBy("created_at", {descending: false})
-        })
-    })
-    test("GET 400: Should return an error if order value is invalid", () => {
-        return request(app)
-        .get("/api/articles?order=banana")
-        .expect(400)
-        .then(({body}) => {
-            const {message} = body
-            expect(message).toBe("Order not valid")
-        })
-    })
+    
 })
 
 describe("/api/articles/:article_id", () => {

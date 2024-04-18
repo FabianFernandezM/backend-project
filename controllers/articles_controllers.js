@@ -1,4 +1,4 @@
-const {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById, updateArticleById} = require("../models/articles_models")
+const {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById, updateArticleById, insertArticle} = require("../models/articles_models")
 
 async function getArticleById(req, res, next) {
     const { article_id } = req.params
@@ -48,6 +48,18 @@ async function postArticleCommentById(req, res, next) {
     }
 }
 
+async function postArticle(req, res, next) {
+    const newArticle = req.body
+    try {
+        const articleWithoutCount = await insertArticle(newArticle)
+        const article = await fetchArticleById(articleWithoutCount.article_id)
+        res.status(201).send({article})
+    } 
+    catch (error) {
+        next(error)
+    }
+}
+
 async function patchArticleById(req, res, next) {
     const { article_id } = req.params
     const { inc_votes } = req.body
@@ -63,4 +75,4 @@ async function patchArticleById(req, res, next) {
 
 
 
-module.exports = {getArticleById, getArticles, getArticleCommentsById, postArticleCommentById, patchArticleById}
+module.exports = {getArticleById, getArticles, getArticleCommentsById, postArticleCommentById, patchArticleById, postArticle}

@@ -66,6 +66,12 @@ async function updateArticleById(article_id, inc_votes) {
     return article.rows[0]
 }
 
+async function insertArticle(newArticle) {
+    const defaultUrl = "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
+    const comment = await db.query(`INSERT INTO articles (title, topic, author, body, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *;`, [newArticle.title, newArticle.topic, newArticle.author, newArticle.body, newArticle.article_img_url || defaultUrl])
+    return comment.rows[0]
+}
+
 async function fetchArticleCommentsById(article_id) {
     const comments = await db.query(`SELECT comment_id, votes, created_at, author, body, article_id
     FROM comments
@@ -95,4 +101,4 @@ async function checkSortByExists(sortBy){
     else return true
 }
 
-module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById, updateArticleById}
+module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById, updateArticleById, insertArticle}

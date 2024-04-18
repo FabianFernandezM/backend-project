@@ -52,6 +52,10 @@ This file contains information about all endpoints present on the database. It *
     - **Parameters**: N/A
     - **Queries:**: topic
     - **Output**: Returns an ***object*** with an "articles" key containing an ***array***  with all (***object***) articles from the database.
+- **POST**: posts an article and retrieves the posted article.
+    - **Parameters**: N/A
+    - **Body**: { author: "name", title: "title", body: "text", topic: "topic" }
+    - **Output**: Returns an ***object*** with an "article" key containing the posted article ***object***.
 
 ### /api/articles/:article_id
 - **GET**: retrieves an article with the requested ID.
