@@ -134,6 +134,42 @@ describe("/api/articles", () => {
             expect(message).toBe("Query not allowed")
         })
     })
+    test("GET 200: Should return an array of article objects with the sorting as per specified query value", () => {
+        return request(app)
+        .get("/api/articles?sort_by=article_id")
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles).toBeSortedBy("article_id", {descending: true})
+        })
+    })
+    test("GET 400: Should return an error if the sort column does not exist", () => {
+        return request(app)
+        .get("/api/articles?sort_by=banana")
+        .expect(400)
+        .then(({body}) => {
+            const {message} = body
+            expect(message).toBe("Column does not exist")
+        })
+    })
+    test("GET 200: Should return an array of article objects with the order as per specified query value", () => {
+        return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({body}) => {
+            const {articles} = body
+            expect(articles).toBeSortedBy("created_at", {descending: false})
+        })
+    })
+    test("GET 400: Should return an error if order value is invalid", () => {
+        return request(app)
+        .get("/api/articles?order=banana")
+        .expect(400)
+        .then(({body}) => {
+            const {message} = body
+            expect(message).toBe("Order not valid")
+        })
+    })
 })
 
 describe("/api/articles/:article_id", () => {

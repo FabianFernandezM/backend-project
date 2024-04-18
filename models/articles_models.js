@@ -2,16 +2,10 @@ const db = require("../db/connection")
 
 async function fetchArticles(query, queryNames) {
     const validQueryNames = ["topic", "sort_by", "order"]
-    const validTopics = db.query("")
 
     for (let i = 0; i < queryNames.length; i++) {
         if (!validQueryNames.includes(queryNames[i]))
         return Promise.reject({ status: 400, message: `Query not allowed` })
-    }
-
-    for (let i = 0; i < queryNames.length; i++) {
-        const queryExists = await checkQueryExists(query, "articles", queryNames[i])
-        if (queryExists === false) return Promise.reject({ status: 404, message: "Not found" })
     }
 
 
@@ -24,16 +18,29 @@ async function fetchArticles(query, queryNames) {
     const queryValues = []
 
     if (query.topic){
-        sqlStr += `WHERE topic=$1 `
+        const topicExists = await checkTopicExists(query.topic)
+        if (topicExists === false) return Promise.reject({ status: 404, message: "Not found" })
+
         queryValues.push(query.topic)
+        sqlStr += `WHERE topic=$${queryValues.length} `
     }
 
     sqlStr += `GROUP BY articles.article_id `
 
     if (query.sort_by){
-        sqlStr += `ORDER BY articles.$2 $3;`
-        queryValues.push("created_at", "DESC")
-    } else {sqlStr += `ORDER BY articles.created_at DESC;`}
+        const sortByExists = await checkSortByExists(query.sort_by)
+        if (sortByExists === false) return Promise.reject({ status: 400, message: "Column does not exist" })
+
+        sqlStr += `ORDER BY articles.${query.sort_by} `
+    } else {sqlStr += `ORDER BY articles.created_at `}
+
+    if (query.order){
+        const validOrders = ["ASC", "DESC"]
+        if (!validOrders.includes(query.order.toUpperCase())) return Promise.reject({ status: 400, message: "Order not valid" })
+
+        sqlStr += `${query.order};`
+    } else {sqlStr += `DESC;`}
+
 
     const articles = await db.query(sqlStr, queryValues)
     return articles.rows
@@ -77,6 +84,22 @@ async function checkQueryExists(query, table, queryName){
     const validQueryQueries = validQueries.rows.map(obj => obj[queryName])
 
     if (!validQueryQueries.includes(query[queryName])) return false
+}
+
+async function checkTopicExists(topic){
+    const topics = await db.query(`SELECT topic FROM articles GROUP BY topic;`)
+    const topicValues = topics.rows.map(obj => obj["topic"])
+
+    if (!topicValues.includes(topic)) return false
+    else return true
+}
+
+async function checkSortByExists(sortBy){
+    const article = await db.query(`SELECT * FROM articles WHERE article_id = 1;`)
+    const validSortBys = Object.keys(article.rows[0])
+
+    if (!validSortBys.includes(sortBy)) return false
+    else return true
 }
 
 module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById, updateArticleById}
