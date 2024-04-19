@@ -101,6 +101,15 @@ describe("/api/articles", () => {
             .then(({body}) => {
                 const {articles, total_count} = body
                 expect(total_count).toBe(13)
+                expect(articles).toBeSortedBy("created_at", {descending: false})
+            })
+        })
+        test("GET 200: Should return an array of article objects with the order as per specified query value", () => {
+            return request(app)
+            .get("/api/articles?order=DESC")
+            .expect(200)
+            .then(({body}) => {
+                const {articles} = body
                 expect(articles).toBeSortedBy("created_at", {descending: true})
             })
         })
@@ -111,7 +120,7 @@ describe("/api/articles", () => {
             .then(({body}) => {
                 const {articles, total_count} = body
                 expect(total_count).toBe(12)
-                expect(articles).toBeSortedBy("created_at", {descending: true})
+                expect(articles).toBeSortedBy("created_at", {descending: false})
                 articles.forEach(article => {
                     article.topic = "mitch"
                 });
@@ -143,12 +152,24 @@ describe("/api/articles", () => {
             .expect(200)
             .then(({body}) => {
                 const {articles, total_count} = body
+                console.log(articles)
                 expect(total_count).toBe(13)
-                expect(articles.length).toBe(10)
+                expect(articles.length).toBe(3)
                 for (let i = 0; i < articles.length; i++) {
-                    expect(articles[i].article_id).toBeGreaterThan(2)
-                    expect(articles[i].article_id).toBeLessThan(13)
+                    expect(articles[i].article_id).toBeGreaterThan(10)
+                    expect(articles[i].article_id).toBeLessThan(14)
                 }
+            })
+        })
+        test("GET 200: Should return an empty array if the page does not contain any articles", () => {
+            return request(app)
+            .get("/api/articles?p=4")
+            .expect(200)
+            .then(({body}) => {
+                const {articles, total_count} = body
+                console.log(articles)
+                expect(total_count).toBe(13)
+                expect(articles.length).toBe(0)
             })
         })
         test("GET 404: Should return 'Not found' if the query name is valid but the value is not found within the database", () => {
@@ -194,15 +215,6 @@ describe("/api/articles", () => {
             .then(({body}) => {
                 const {message} = body
                 expect(message).toBe("Column does not exist")
-            })
-        })
-        test("GET 200: Should return an array of article objects with the order as per specified query value", () => {
-            return request(app)
-            .get("/api/articles?order=asc")
-            .expect(200)
-            .then(({body}) => {
-                const {articles} = body
-                expect(articles).toBeSortedBy("created_at", {descending: false})
             })
         })
         test("GET 400: Should return an error if order value is invalid", () => {

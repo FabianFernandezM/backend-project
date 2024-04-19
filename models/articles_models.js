@@ -43,13 +43,13 @@ async function fetchArticles(query, queryNames) {
         if (!validOrders.includes(query.order.toUpperCase())) return Promise.reject({ status: 400, message: "Order not valid" })
 
         sqlStr += `${query.order} `
-    } else {sqlStr += `DESC `}
+    } else {sqlStr += `ASC `}
 
     if (query.p){
         const regex = /[0-9]/
         if (!regex.test(query.p)) return Promise.reject({ status: 400, message: "Page not valid" })
 
-        sqlStr += `OFFSET ${query.p - 1} ROWS `
+        sqlStr += `OFFSET ${(query.p - 1)*10} ROWS `
     } else { sqlStr += `OFFSET 0 ROWS `}
 
     if (query.limit){
