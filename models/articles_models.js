@@ -92,11 +92,34 @@ async function insertArticle(newArticle) {
     return comment.rows[0]
 }
 
-async function fetchArticleCommentsById(article_id) {
-    const comments = await db.query(`SELECT comment_id, votes, created_at, author, body, article_id
+async function fetchArticleCommentsById(article_id, query, queryNames) {
+    const validQueryNames = ["p", "limit"]
+
+    for (let i = 0; i < queryNames.length; i++) {
+        if (!validQueryNames.includes(queryNames[i]))
+        return Promise.reject({ status: 400, message: `Query not allowed` })
+    }
+
+    let sqlStr = `SELECT comment_id, votes, created_at, author, body, article_id
     FROM comments
     WHERE article_id = $1
-    ORDER BY created_at DESC;`, [article_id])
+    ORDER BY created_at DESC `
+
+    if (query.p){
+        const regex = /[0-9]/
+        if (!regex.test(query.p)) return Promise.reject({ status: 400, message: "Page not valid" })
+
+        sqlStr += `OFFSET ${(query.p - 1)*10} ROWS `
+    } else { sqlStr += `OFFSET 0 ROWS `}
+
+    if (query.limit){
+        const regex = /[0-9]/
+        if (!regex.test(query.limit)) return Promise.reject({ status: 400, message: "Limit not valid" })
+
+        sqlStr += `FETCH FIRST ${query.limit} ROW ONLY;`
+    } else { sqlStr += `FETCH FIRST 10 ROW ONLY;`}
+
+    const comments = await db.query(sqlStr, [article_id])
     return comments.rows
 }
 

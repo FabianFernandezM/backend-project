@@ -12,10 +12,12 @@ async function getArticleById(req, res, next) {
 }
 
 async function getArticleCommentsById(req, res, next) {
+    const query = req.query
+    const queryNames = Object.keys(query)
     const { article_id } = req.params
     try {
         await fetchArticleById(article_id)
-        const comments = await fetchArticleCommentsById(article_id)
+        const comments = await fetchArticleCommentsById(article_id, query, queryNames)
         res.status(200).send({comments})
     } 
     catch (error) {

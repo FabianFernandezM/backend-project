@@ -152,7 +152,6 @@ describe("/api/articles", () => {
             .expect(200)
             .then(({body}) => {
                 const {articles, total_count} = body
-                console.log(articles)
                 expect(total_count).toBe(13)
                 expect(articles.length).toBe(3)
                 for (let i = 0; i < articles.length; i++) {
@@ -167,7 +166,6 @@ describe("/api/articles", () => {
             .expect(200)
             .then(({body}) => {
                 const {articles, total_count} = body
-                console.log(articles)
                 expect(total_count).toBe(13)
                 expect(articles.length).toBe(0)
             })
@@ -394,7 +392,7 @@ describe("/api/articles/:article_id/comments", () => {
             .expect(200)
             .then(({body}) => {
                 const {comments} = body
-                expect(comments.length).toBe(11)
+                expect(comments.length).toBe(10)
                 comments.forEach(comment => {
                     expect(typeof comment.comment_id).toBe("number")
                     expect(typeof comment.votes).toBe("number")
@@ -411,8 +409,38 @@ describe("/api/articles/:article_id/comments", () => {
             .expect(200)
             .then(({body}) => {
                 const {comments} = body
-                expect(comments.length).toBe(11)
+                expect(comments.length).toBe(10)
                 expect(comments).toBeSortedBy("created_at", {descending: true})
+            })
+        })
+        test("GET 200: Should return an array of comment objects limited by the specified limit on query", () => {
+            return request(app)
+            .get("/api/articles/1/comments?limit=5")
+            .expect(200)
+            .then(({body}) => {
+                const {comments} = body
+                expect(comments.length).toBe(5)
+                expect(comments).toBeSortedBy("created_at", {descending: true})
+            })
+        })
+        test("GET 200: Should return an array of comment objects which belong to the specific page", () => {
+            return request(app)
+            .get("/api/articles/1/comments?p=2")
+            .expect(200)
+            .then(({body}) => {
+                const {comments} = body
+                expect(comments.length).toBe(1)
+                expect(comments).toBeSortedBy("created_at", {descending: true})
+                expect(comments[0].created_at).toBe("2020-01-01T03:08:00.000Z")
+            })
+        })
+        test("GET 200: Should return an empty array if there's not enough comments to cover that page", () => {
+            return request(app)
+            .get("/api/articles/1/comments?p=5")
+            .expect(200)
+            .then(({body}) => {
+                const {comments} = body
+                expect(comments.length).toBe(0)
             })
         })
         test("GET 200: If the article exists but has no comments, it should return an empty array", () => {
@@ -438,6 +466,22 @@ describe("/api/articles/:article_id/comments", () => {
               .expect(400)
               .then(({body}) => {
                 expect(body.message).toBe('Bad request');
+            });
+        });
+        test('GET 400: sends an appropriate status and error message when given an invalid limit', () => {
+            return request(app)
+              .get('/api/articles/1/comments?limit=banana')
+              .expect(400)
+              .then(({body}) => {
+                expect(body.message).toBe("Limit not valid");
+            });
+        });
+        test('GET 400: sends an appropriate status and error message when given an invalid p', () => {
+            return request(app)
+              .get('/api/articles/1/comments?p=banana')
+              .expect(400)
+              .then(({body}) => {
+                expect(body.message).toBe("Page not valid");
             });
         });
     })
