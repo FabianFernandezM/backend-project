@@ -80,8 +80,8 @@ describe("/api/articles", () => {
             .get("/api/articles")
             .expect(200)
             .then(({body}) => {
-                const {articles} = body
-                expect(articles.length).toBe(13)
+                const {articles, total_count} = body
+                expect(total_count).toBe(13)
                 articles.forEach(article => {
                     expect(typeof article.author).toBe("string")
                     expect(typeof article.title).toBe("string")
@@ -99,8 +99,8 @@ describe("/api/articles", () => {
             .get("/api/articles")
             .expect(200)
             .then(({body}) => {
-                const {articles} = body
-                expect(articles.length).toBe(13)
+                const {articles, total_count} = body
+                expect(total_count).toBe(13)
                 expect(articles).toBeSortedBy("created_at", {descending: true})
             })
         })
@@ -109,12 +109,46 @@ describe("/api/articles", () => {
             .get("/api/articles?topic=mitch")
             .expect(200)
             .then(({body}) => {
-                const {articles} = body
-                expect(articles.length).toBe(12)
+                const {articles, total_count} = body
+                expect(total_count).toBe(12)
                 expect(articles).toBeSortedBy("created_at", {descending: true})
                 articles.forEach(article => {
                     article.topic = "mitch"
                 });
+            })
+        })
+        test("GET 200: Should return an array of certain limit when querying a limit", () => {
+            return request(app)
+            .get("/api/articles?limit=5")
+            .expect(200)
+            .then(({body}) => {
+                const {articles, total_count} = body
+                expect(total_count).toBe(13)
+                expect(articles.length).toBe(5)
+            })
+        })
+        test("GET 200: Total count should still be affected by other queries", () => {
+            return request(app)
+            .get("/api/articles?limit=5&topic=mitch")
+            .expect(200)
+            .then(({body}) => {
+                const {articles, total_count} = body
+                expect(total_count).toBe(12)
+                expect(articles.length).toBe(5)
+            })
+        })
+        test("GET 200: Should return an array with the correct articles if queried for a page", () => {
+            return request(app)
+            .get("/api/articles?p=2&sort_by=article_id")
+            .expect(200)
+            .then(({body}) => {
+                const {articles, total_count} = body
+                expect(total_count).toBe(13)
+                expect(articles.length).toBe(10)
+                for (let i = 0; i < articles.length; i++) {
+                    expect(articles[i].article_id).toBeGreaterThan(2)
+                    expect(articles[i].article_id).toBeLessThan(13)
+                }
             })
         })
         test("GET 404: Should return 'Not found' if the query name is valid but the value is not found within the database", () => {
@@ -135,13 +169,22 @@ describe("/api/articles", () => {
                 expect(message).toBe("Query not allowed")
             })
         })
-        test("GET 200: Should return an array of article objects with the sorting as per specified query value", () => {
+        test("GET 400: Should return 'Page not valid' if the page value is not valid", () => {
             return request(app)
-            .get("/api/articles?sort_by=article_id")
-            .expect(200)
+            .get("/api/articles?p=banana")
+            .expect(400)
             .then(({body}) => {
-                const {articles} = body
-                expect(articles).toBeSortedBy("article_id", {descending: true})
+                const {message} = body
+                expect(message).toBe("Page not valid")
+            })
+        })
+        test("GET 400: Should return 'limit not valid' if the page value is not valid", () => {
+            return request(app)
+            .get("/api/articles?limit=banana")
+            .expect(400)
+            .then(({body}) => {
+                const {message} = body
+                expect(message).toBe("Limit not valid")
             })
         })
         test("GET 400: Should return an error if the sort column does not exist", () => {

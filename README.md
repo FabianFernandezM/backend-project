@@ -50,7 +50,7 @@ This file contains information about all endpoints present on the database. It *
 ### /api/articles
 - **GET**: retrieves the list of articles present in the database.
     - **Parameters**: N/A
-    - **Queries:**: topic
+    - **Queries:**: "author", "topic", "sort_by", "order", "p", "limit"
     - **Output**: Returns an ***object*** with an "articles" key containing an ***array***  with all (***object***) articles from the database.
 - **POST**: posts an article and retrieves the posted article.
     - **Parameters**: N/A
