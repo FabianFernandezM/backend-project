@@ -26,8 +26,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Create env files
-      run: echo PGDATABASE=${{secrets.TEST_DB}} > .env.test
-           echo PGDATABASE=${{secrets.DEV_DB}} > .env.development
+      run: echo PGDATABASE=nc_news_test > .env.test
+           echo PGDATABASE=nc_news > .env.development
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
