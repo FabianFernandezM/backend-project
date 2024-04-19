@@ -204,8 +204,7 @@ describe("/api/articles", () => {
                 expect(total_count).toBe(13)
                 expect(articles.length).toBe(3)
                 for (let i = 0; i < articles.length; i++) {
-                    expect(articles[i].article_id).toBeGreaterThan(10)
-                    expect(articles[i].article_id).toBeLessThan(14)
+                    expect(articles[i].article_id).toBe(11+i)
                 }
             })
         })
@@ -312,6 +311,29 @@ describe("/api/articles", () => {
                 .expect(400)
                 .then(({body}) => {
                     expect(body.message).toBe('Bad request');
+            });
+        });
+    })
+    describe ("DELETE", () => {
+        test("DELETE 204: Should delete the article and return no content", () => {
+            return request(app)
+            .delete("/api/articles/1")
+            .expect(204)
+        })
+        test('DELETE 404: sends an appropriate status and error message when given a valid but non-existent article id', () => {
+            return request(app)
+              .delete('/api/articles/999')
+              .expect(404)
+              .then(({body}) => {
+                expect(body.message).toBe('This article does not exist');
+            });
+        });
+        test('DELETE 400: sends an appropriate status and error message when given an invalid article id', () => {
+            return request(app)
+              .delete('/api/articles/not-an-id')
+              .expect(400)
+              .then(({body}) => {
+                expect(body.message).toBe('Bad request');
             });
         });
     })

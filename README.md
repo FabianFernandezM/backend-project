@@ -60,6 +60,9 @@ This file contains information about all endpoints present on the database. It *
     - **Parameters**: N/A
     - **Body**: { author: "name", title: "title", body: "text", topic: "topic" }
     - **Output**: Returns an ***object*** with an "article" key containing the posted article ***object***.
+- **DELETE**: deletes the article with the ID provided and all comments on that article. Returns nothing.
+    - **Parameters**: article_id (number)
+    - **Output**: N/A
 
 ### /api/articles/:article_id
 - **GET**: retrieves an article with the requested ID.

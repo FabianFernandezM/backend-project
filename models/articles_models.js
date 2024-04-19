@@ -1,4 +1,5 @@
 const db = require("../db/connection")
+const { removeCommentById } = require("./comments_models")
 
 async function fetchArticles(query, queryNames) {
     const validQueryNames = ["topic", "sort_by", "order", "p", "limit"]
@@ -128,6 +129,17 @@ async function insertArticleCommentById(article_id, newComment) {
     return comment.rows[0]
 }
 
+async function removeArticleById(article_id) {
+    const comments = await db.query(`SELECT comment_id FROM comments WHERE article_id = $1;`, [article_id])
+
+    for await (const comment of comments.rows) {
+        await removeCommentById(comment.comment_id)
+    }
+
+    const output = await db.query(`DELETE FROM articles WHERE article_id = $1`, [article_id])
+    return output
+}
+
 async function checkTopicExists(topic){
     const topics = await db.query(`SELECT slug FROM topics;`)
     const topicValues = topics.rows.map(obj => obj["slug"])
@@ -144,4 +156,4 @@ async function checkSortByExists(sortBy){
     else return true
 }
 
-module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById, updateArticleById, insertArticle}
+module.exports = {fetchArticleById, fetchArticles, fetchArticleCommentsById, insertArticleCommentById, updateArticleById, insertArticle, removeArticleById}
