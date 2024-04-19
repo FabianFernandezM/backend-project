@@ -46,6 +46,10 @@ This file contains information about all endpoints present on the database. It *
     - **Parameters**: N/A
     - **Queries**: topic, sort_by, order
     - **Output**: Returns an ***object*** with a "topic" key containing an ***array*** containing all (***object***) topics from the database.
+- **POST**: posts a topic and retrieves the posted topic.
+    - **Parameters**: N/A
+    - **Body**: { slug: "name", description: "text"}
+    - **Output**: Returns an ***object*** with a "topic" key containing the posted topic ***object***.
 
 ### /api/articles
 - **GET**: retrieves the list of articles present in the database.
