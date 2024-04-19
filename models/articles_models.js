@@ -88,8 +88,8 @@ async function updateArticleById(article_id, inc_votes) {
 
 async function insertArticle(newArticle) {
     const defaultUrl = "https://images.pexels.com/photos/97050/pexels-photo-97050.jpeg?w=700&h=700"
-    const comment = await db.query(`INSERT INTO articles (title, topic, author, body, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *;`, [newArticle.title, newArticle.topic, newArticle.author, newArticle.body, newArticle.article_img_url || defaultUrl])
-    return comment.rows[0]
+    const article = await db.query(`INSERT INTO articles (title, topic, author, body, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *;`, [newArticle.title, newArticle.topic, newArticle.author, newArticle.body, newArticle.article_img_url || defaultUrl])
+    return article.rows[0]
 }
 
 async function fetchArticleCommentsById(article_id, query, queryNames) {
@@ -129,8 +129,8 @@ async function insertArticleCommentById(article_id, newComment) {
 }
 
 async function checkTopicExists(topic){
-    const topics = await db.query(`SELECT topic FROM articles GROUP BY topic;`)
-    const topicValues = topics.rows.map(obj => obj["topic"])
+    const topics = await db.query(`SELECT slug FROM topics;`)
+    const topicValues = topics.rows.map(obj => obj["slug"])
 
     if (!topicValues.includes(topic)) return false
     else return true

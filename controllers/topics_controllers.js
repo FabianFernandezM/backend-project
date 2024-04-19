@@ -1,4 +1,4 @@
-const {fetchTopics} = require("../models/topics_models")
+const {fetchTopics, insertTopic} = require("../models/topics_models")
 
 function getEndpoints(req, res, next) {
     const endpoints = require(`${__dirname}/../endpoints.json`)
@@ -15,4 +15,15 @@ async function getTopics(req, res, next) {
     }
 }
 
-module.exports = {getTopics, getEndpoints}
+async function postTopic(req, res, next) {
+    const newTopic = req.body
+    try {
+        const topic = await insertTopic(newTopic)
+        res.status(201).send({topic})
+    } 
+    catch (error) {
+        next(error)
+    }
+}
+
+module.exports = {getTopics, getEndpoints, postTopic}

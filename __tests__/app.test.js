@@ -31,35 +31,84 @@ describe("/api", () => {
 })
 
 describe("/api/topics", () => {
-    test("GET 200: Should return an object with an array on its 'topics' key", () => {
-        return request(app)
-        .get("/api/topics")
-        .expect(200)
-        .then(({body}) => {
-            const {topics} = body
-            expect(typeof body).toBe("object")
-            expect(Array.isArray(topics)).toBe(true)
+    describe("GET", () => {
+        test("GET 200: Should return an object with an array on its 'topics' key", () => {
+            return request(app)
+            .get("/api/topics")
+            .expect(200)
+            .then(({body}) => {
+                const {topics} = body
+                expect(typeof body).toBe("object")
+                expect(Array.isArray(topics)).toBe(true)
+            })
+        })
+        test("GET 200: Should return an array of topic objects", () => {
+            const topicsFile = require(`${__dirname}/../db/data/test-data/topics.js`)
+            return request(app)
+            .get("/api/topics")
+            .expect(200)
+            .then(({body}) => {
+                const {topics} = body
+                expect(topics.length).toBe(topicsFile.length)
+                expect(topics).toEqual(topicsFile)
+            })
+        })
+        test("GET 404: Should return a 'Path not found' is the path is incorrect", () => {
+            return request(app)
+            .get("/api/incorrectPath")
+            .expect(404)
+            .then(({body}) => {
+                const {message} = body
+                expect(message).toBe("Path not found")
+            })
         })
     })
-    test("GET 200: Should return an array of topic objects", () => {
-        const topicsFile = require(`${__dirname}/../db/data/test-data/topics.js`)
-        return request(app)
-        .get("/api/topics")
-        .expect(200)
-        .then(({body}) => {
-            const {topics} = body
-            expect(topics.length).toBe(topicsFile.length)
-            expect(topics).toEqual(topicsFile)
+    describe ("POST", () => {
+        test("POST 201: Should return the posted topic", () => {
+            const newTopic = { slug: "dogs", description: "Oh My Dog" }
+            return request(app)
+                .post("/api/topics")
+                .send(newTopic)
+                .expect(201)
+                .then(({body}) => {
+                    const {topic} = body
+                    expect(topic.slug).toBe("dogs")
+                    expect(topic.description).toBe("Oh My Dog")
+            })
         })
-    })
-    test("GET 404: Should return a 'Path not found' is the path is incorrect", () => {
-        return request(app)
-        .get("/api/incorrectPath")
-        .expect(404)
-        .then(({body}) => {
-            const {message} = body
-            expect(message).toBe("Path not found")
-        })
+        test('POST 201: Should return the posted topic even if keys are empty strings', () => {
+            const newTopic = {slug: "", description: ""}
+            return request(app)
+                .post("/api/topics")
+                .send(newTopic)
+                .expect(201)
+                .then(({body}) => {
+                    const {topic} = body
+                    expect(topic.slug).toBe("")
+                    expect(topic.description).toBe("")
+            });
+        });
+        test('POST 201: Should return the posted topic as long as the primary key is within the input object', () => {
+            const newTopic = {slug: "Dog"}
+            return request(app)
+                .post("/api/topics")
+                .send(newTopic)
+                .expect(201)
+                .then(({body}) => {
+                    const {topic} = body
+                    expect(topic.slug).toBe("Dog")
+            });
+        });
+        test('POST 400: sends an appropriate status and error message when slug primary key is not given within the object', () => {
+            const newTopic = {description: "An amazing dog"}
+            return request(app)
+                .post("/api/topics")
+                .send(newTopic)
+                .expect(400)
+                .then(({body}) => {
+                    expect(body.message).toBe('Bad request');
+            });
+        });
     })
 })
 
