@@ -29,6 +29,6 @@ jobs:
       run: echo PGDATABASE=nc_news_test > .env.test
            echo PGDATABASE=nc_news > .env.development
     - run: npm ci
-    - run: npm run setup-db
+    - run: npm run setup-dbs
     - run: npm run build --if-present
     - run: npm test
