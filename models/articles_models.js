@@ -1,13 +1,14 @@
 const db = require("../db/connection")
 
 async function fetchArticles(query, queryNames) {
-    const validQueryNames = ["topic", "sort_by", "order"]
+    const validQueryNames = ["topic", "sort_by", "order", "p", "limit"]
 
     for (let i = 0; i < queryNames.length; i++) {
         if (!validQueryNames.includes(queryNames[i]))
         return Promise.reject({ status: 400, message: `Query not allowed` })
     }
-
+    const queryValues = []
+    const totalCountQueryValues = []
 
     let sqlStr = `SELECT articles.author, articles.title, articles.article_id,
     articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
@@ -15,14 +16,17 @@ async function fetchArticles(query, queryNames) {
     FROM articles
     LEFT JOIN comments
     ON articles.article_id = comments.article_id `
-    const queryValues = []
+
+    let sqlCountStr = `SELECT COUNT(*)::INT AS total_count FROM articles `
 
     if (query.topic){
         const topicExists = await checkTopicExists(query.topic)
         if (topicExists === false) return Promise.reject({ status: 404, message: "Not found" })
 
         queryValues.push(query.topic)
+        totalCountQueryValues.push(query.topic)
         sqlStr += `WHERE topic=$${queryValues.length} `
+        sqlCountStr += `WHERE topic=$${queryValues.length} `
     }
 
     sqlStr += `GROUP BY articles.article_id `
@@ -38,12 +42,28 @@ async function fetchArticles(query, queryNames) {
         const validOrders = ["ASC", "DESC"]
         if (!validOrders.includes(query.order.toUpperCase())) return Promise.reject({ status: 400, message: "Order not valid" })
 
-        sqlStr += `${query.order};`
-    } else {sqlStr += `DESC;`}
+        sqlStr += `${query.order} `
+    } else {sqlStr += `DESC `}
+
+    if (query.p){
+        const regex = /[0-9]/
+        if (!regex.test(query.p)) return Promise.reject({ status: 400, message: "Page not valid" })
+
+        sqlStr += `OFFSET ${query.p - 1} ROWS `
+    } else { sqlStr += `OFFSET 0 ROWS `}
+
+    if (query.limit){
+        const regex = /[0-9]/
+        if (!regex.test(query.limit)) return Promise.reject({ status: 400, message: "Limit not valid" })
+
+        sqlStr += `FETCH FIRST ${query.limit} ROW ONLY;`
+    } else { sqlStr += `FETCH FIRST 10 ROW ONLY;`}
 
 
+    const totalArticles = await db.query(sqlCountStr, totalCountQueryValues)
     const articles = await db.query(sqlStr, queryValues)
-    return articles.rows
+
+    return { "articles" : articles.rows, "total_count" : totalArticles.rows[0].total_count }
 }
 
 async function fetchArticleById(article_id) {

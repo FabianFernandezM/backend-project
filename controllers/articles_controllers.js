@@ -28,7 +28,7 @@ async function getArticles(req, res, next) {
     const queryNames = Object.keys(query)
     try {
         const articles = await fetchArticles(query, queryNames)
-        res.status(200).send({articles})
+        res.status(200).send(articles)
     } 
     catch (error) {
         next(error)
