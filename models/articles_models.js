@@ -149,8 +149,7 @@ async function checkTopicExists(topic){
 }
 
 async function checkSortByExists(sortBy){
-    const article = await db.query(`SELECT * FROM articles WHERE article_id = 1;`)
-    const validSortBys = Object.keys(article.rows[0])
+    const validSortBys = ["title", "topic", "author", "created_at", "votes", "article_image_url", "article_id", "comment_count"]
 
     if (!validSortBys.includes(sortBy)) return false
     else return true
