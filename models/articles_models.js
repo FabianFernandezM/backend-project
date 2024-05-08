@@ -36,7 +36,7 @@ async function fetchArticles(query, queryNames) {
         const sortByExists = await checkSortByExists(query.sort_by)
         if (sortByExists === false) return Promise.reject({ status: 400, message: "Column does not exist" })
 
-        sqlStr += `ORDER BY articles.${query.sort_by} `
+        sqlStr += `ORDER BY ${query.sort_by} `
     } else {sqlStr += `ORDER BY articles.created_at `}
 
     if (query.order){
