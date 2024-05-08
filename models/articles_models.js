@@ -30,7 +30,7 @@ async function fetchArticles(query, queryNames) {
         sqlCountStr += `WHERE topic=$${queryValues.length} `
     }
 
-    sqlStr += `GROUP BY articles.article_id `
+    sqlStr += `GROUP BY article_id `
 
     if (query.sort_by){
         const sortByExists = await checkSortByExists(query.sort_by)
